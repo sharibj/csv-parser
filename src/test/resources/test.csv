@@ -1,0 +1,5 @@
+email,phone,source
+test@test.com,123,google.com
+test@test.com,,google.com
+test1@test.com,321,google.com
+test1@test.com,321,something.com
