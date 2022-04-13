@@ -14,28 +14,28 @@ public class ParseCsv {
 
     private DbHandler dbHandler;
     private BlockingQueue<PageVisitModel> dataQueue;
-    private BlockingQueue<PageVisitModel> insertQueue;
     private ExecutorService executor;
     private PageVisitConsumer consumer;
     private static final int DATA_QUEUE_CAPACITY = 100;
-    private static final int INSERT_QUEUE_CAPACITY = 1000;
     private static final int NUM_CONSUMERS = 10;
 
     public ParseCsv() {
-        dbHandler = new DbHandler();
+        dbHandler = new DbHandler("jdbc:h2:file:./db/proddb");
         dbHandler.deleteAll();
         dataQueue = new LinkedBlockingDeque<>(DATA_QUEUE_CAPACITY);
         consumer = new PageVisitConsumer(dataQueue, dbHandler);
         executor =
                 Executors.newFixedThreadPool(NUM_CONSUMERS);
-        /*new ThreadPoolExecutor(0, numConsumers, 0, TimeUnit.SECONDS, new SynchronousQueue<>());*/
     }
 
+    @SneakyThrows
     public long getUniquePageVisitCount() {
         spawnConsumers(executor);
         produce();
         shutDownConsumers();
-        return getCount();
+        long count = getCount();
+        dbHandler.close();
+        return count;
     }
 
     @SneakyThrows

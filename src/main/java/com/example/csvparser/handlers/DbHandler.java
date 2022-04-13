@@ -10,9 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
+import lombok.SneakyThrows;
 
 public class DbHandler implements AutoCloseable {
-    String url = "jdbc:h2:file:./db/proddb";
+    static Semaphore semaphore = new Semaphore(1);
+    String url;
     Connection conn;
     Statement statement;
     PreparedStatement preparedStatement;
@@ -22,20 +27,15 @@ public class DbHandler implements AutoCloseable {
         this.init();
     }
 
-    //TODO: Consider using singleton
-    public DbHandler() {
-        this.init();
+    private DbHandler() {
     }
 
+    @SneakyThrows
     public void init() {
-        try {
-            conn = DriverManager.getConnection(url);
-            statement = conn.createStatement();
-            createFreshTable(statement);
-            preparedStatement = conn.prepareStatement(QueryConstants.INSERT_ROW);
-        } catch (SQLException e) {
-//            e.printStackTrace();
-        }
+        conn = DriverManager.getConnection(url);
+        statement = conn.createStatement();
+        createFreshTable(statement);
+        preparedStatement = conn.prepareStatement(QueryConstants.INSERT_ROW);
     }
 
     private void createFreshTable(Statement statement) throws SQLException {
@@ -52,15 +52,16 @@ public class DbHandler implements AutoCloseable {
         return -1;
     }
 
+    @SneakyThrows
     public int insert(PageVisitModel model) {
-        //TODO: Add batch counter here
-        if (model.isValid()) {
-            //TODO: Execute Batch
+        if (model.isValid() &&
+                semaphore.tryAcquire(60, TimeUnit.SECONDS)) {
             try {
                 setModelToPreparedStatement(model);
                 return preparedStatement.executeUpdate();
-            } catch (SQLException e) {
-                //ignore duplicate
+            } catch (SQLException ignored) {
+            } finally {
+                semaphore.release();
             }
         }
         return -1;
