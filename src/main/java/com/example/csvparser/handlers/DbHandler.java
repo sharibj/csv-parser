@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 public class DbHandler implements AutoCloseable {
     String url = "jdbc:h2:file:./db/proddb";
@@ -18,17 +19,23 @@ public class DbHandler implements AutoCloseable {
 
     public DbHandler(String url) {
         this.url = url;
+        this.init();
     }
 
     //TODO: Consider using singleton
     public DbHandler() {
+        this.init();
     }
 
-    public void init() throws SQLException {
-        conn = DriverManager.getConnection(url);
-        statement = conn.createStatement();
-        createFreshTable(statement);
-        preparedStatement = conn.prepareStatement(QueryConstants.INSERT_ROW);
+    public void init() {
+        try {
+            conn = DriverManager.getConnection(url);
+            statement = conn.createStatement();
+            createFreshTable(statement);
+            preparedStatement = conn.prepareStatement(QueryConstants.INSERT_ROW);
+        } catch (SQLException e) {
+//            e.printStackTrace();
+        }
     }
 
     private void createFreshTable(Statement statement) throws SQLException {
@@ -36,20 +43,27 @@ public class DbHandler implements AutoCloseable {
         statement.execute(QueryConstants.CREATE_TABLE);
     }
 
-    public void deleteAll() throws SQLException {
-        statement.executeUpdate(QueryConstants.DELETE_ALL);
+    public int deleteAll() {
+        try {
+            return statement.executeUpdate(QueryConstants.DELETE_ALL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 
-    public void insert(PageVisitModel model) throws SQLException {
+    public int insert(PageVisitModel model) {
+        //TODO: Add batch counter here
         if (model.isValid()) {
-            setModelToPreparedStatement(model);
             //TODO: Execute Batch
             try {
-                preparedStatement.executeUpdate();
+                setModelToPreparedStatement(model);
+                return preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 //ignore duplicate
             }
         }
+        return -1;
     }
 
     private void setModelToPreparedStatement(PageVisitModel model) throws SQLException {
@@ -59,10 +73,15 @@ public class DbHandler implements AutoCloseable {
 
     }
 
-    public int getCount() throws SQLException {
-        ResultSet rs = statement.executeQuery("SELECT COUNT (*) from pagevisits;");
-        rs.next();
-        return rs.getInt(1);
+    public Optional<Long> getCount() {
+        try {
+            ResultSet rs = statement.executeQuery("SELECT COUNT (*) from pagevisits;");
+            rs.next();
+            return Optional.of(rs.getLong(1));
+        } catch (SQLException e) {
+//            e.printStackTrace();
+        }
+        return Optional.empty();
     }
 
     @Override

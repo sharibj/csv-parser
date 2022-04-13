@@ -52,9 +52,10 @@ class DbHandlerTest {
         insertRandomData(5);
 
         // when
-        subject.deleteAll();
+        int rowsDeleted = subject.deleteAll();
 
         // then
+        Assertions.assertEquals(5, rowsDeleted);
         ResultSet rs = stmt.executeQuery("Select * from pagevisits;");
         Assertions.assertFalse(rs.next());
     }
@@ -65,9 +66,10 @@ class DbHandlerTest {
         subject.init();
 
         // when
-        subject.insert(new PageVisitModel("email", "phone", "source"));
+        int rowsInserted = subject.insert(new PageVisitModel("email", "phone", "source"));
 
         // then
+        Assertions.assertEquals(1, rowsInserted);
         ResultSet rs = stmt.executeQuery("Select * from pagevisits;");
         Assertions.assertTrue(rs.next());
         Assertions.assertEquals("email", rs.getString(1));
@@ -82,9 +84,10 @@ class DbHandlerTest {
         subject.init();
 
         // when
-        subject.insert(new PageVisitModel("email", "phone", null));
+        int rowsInserted = subject.insert(new PageVisitModel("email", "phone", null));
 
         // then
+        Assertions.assertEquals(-1, rowsInserted);
         ResultSet rs = stmt.executeQuery("Select * from pagevisits;");
         Assertions.assertFalse(rs.next());
     }
@@ -166,7 +169,7 @@ class DbHandlerTest {
         subject.insert(new PageVisitModel("email2", "phone", "source"));
 
         // then
-        Assertions.assertEquals(2, subject.getCount());
+        Assertions.assertEquals(2, subject.getCount().get());
 
     }
 
@@ -180,7 +183,7 @@ class DbHandlerTest {
         subject.insert(new PageVisitModel("email3", "phone", "source"));
 
         // then
-        Assertions.assertEquals(3, subject.getCount());
+        Assertions.assertEquals(3, subject.getCount().get());
 
     }
 

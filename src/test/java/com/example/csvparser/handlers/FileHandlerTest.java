@@ -6,15 +6,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Sql()
 class FileHandlerTest {
 
-    FileHandler subject = new FileHandler();
 
     @Test
     void testGetFileIterator() throws IOException {
-        LineIterator iterator = subject.getFileIterator("./src/test/resources/test.txt");
-        Assertions.assertEquals("Hello World!", iterator.nextLine());
+        Optional<LineIterator> iterator =
+                FileHandler.getFileIterator("./src/test/resources/test.txt");
+        Assertions.assertEquals("Hello World!", iterator.get().nextLine());
     }
 }

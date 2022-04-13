@@ -25,3 +25,5 @@ hs_err_pid*
 .idea
 target/
 db/
+src/test/resources/huge.csv
+*.DS_Store
