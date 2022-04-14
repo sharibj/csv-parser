@@ -18,7 +18,8 @@ The database gets purged on every run, so the count always represents the count 
 - Time taken to compute = 55min
 
 **Note:** Can be made faster using hashcodes. For now, this is listed in the "Future tweaks".
-##Steps to execute
+
+## Steps to execute
 Go to the project directory and run the blow command
 
 `./mvnw clean install`
