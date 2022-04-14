@@ -1,6 +1,10 @@
-package com.example.csvparser.handlers;
+package com.example.csvparser.parsers;
 
+import com.example.csvparser.handlers.DbHandler;
+import com.example.csvparser.handlers.FileHandler;
 import com.example.csvparser.model.PageVisitModel;
+import com.example.csvparser.prosumers.PageVisitConsumer;
+import com.example.csvparser.prosumers.PageVisitProducer;
 
 import org.apache.commons.io.LineIterator;
 

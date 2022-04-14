@@ -1,5 +1,6 @@
-package com.example.csvparser.handlers;
+package com.example.csvparser.prosumers;
 
+import com.example.csvparser.handlers.DbHandler;
 import com.example.csvparser.model.PageVisitModel;
 
 import java.util.concurrent.BlockingQueue;

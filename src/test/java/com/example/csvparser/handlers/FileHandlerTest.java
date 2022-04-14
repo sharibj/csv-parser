@@ -4,9 +4,7 @@ import com.example.csvparser.FileWriter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.jdbc.Sql;
 
-@Sql()
 class FileHandlerTest {
 
 

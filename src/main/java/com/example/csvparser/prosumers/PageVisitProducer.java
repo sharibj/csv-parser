@@ -1,4 +1,4 @@
-package com.example.csvparser.handlers;
+package com.example.csvparser.prosumers;
 
 import com.example.csvparser.model.PageVisitModel;
 

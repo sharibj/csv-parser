@@ -52,10 +52,9 @@ class DbHandlerTest {
         insertRandomData(5);
 
         // when
-        int rowsDeleted = subject.deleteAll();
+        subject.deleteAll();
 
         // then
-        Assertions.assertEquals(5, rowsDeleted);
         ResultSet rs = stmt.executeQuery("Select * from pagevisits;");
         Assertions.assertFalse(rs.next());
     }
