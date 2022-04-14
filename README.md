@@ -12,7 +12,7 @@ The unique count at this point is simply the total count of rows in the table.
 The database gets purged on every run, so the count always represents the count of the current file.
 
 
-##Test result
+## Test result
 - File size = 1.3GB
 - Total rows = 29 Million rows
 - Time taken to compute = 55min
@@ -26,19 +26,19 @@ Go to the project directory and run the blow command
 
 `./mvnw compile exec:java
 `
-####OR
+#### OR
 
 Import the maven project in your IDE and run the `CsvParserApplication` class
 
-##How to use
+## How to use
 Once executed, you are prompted to enter the file path in the CLI.
 Just enter the full (or relative) path and press enter.
 The program runs in a loop so if you want to exit, simply type 'exit' instead of file path.
 The output gets simply printed in the console at the end of each parsing cycle.
 
 
-##Assumptions
-####CSV File
+## Assumptions
+#### CSV File
 - Csv file has data in this format:
 `email,phone,source`
 - First line of the csv file is a header.
@@ -47,7 +47,7 @@ The output gets simply printed in the console at the end of each parsing cycle.
 - Uniqueness gets decided based on the first 2 fields (email and phone number).
 - Any empty, invalid or duplicate lines will be skipped.
 
-##Highlights
+## Highlights
 - Producer Consumer pattern
 - Only 1 Producer since the data gets read from a file on the disk
 - Many consumers that consume and persist the data in parallel
@@ -55,7 +55,7 @@ The output gets simply printed in the console at the end of each parsing cycle.
 - Database (H2) specific optimisations like using truncate instead of delete and using count(\*) since H2 has optimised count(\*)
 - Includes a small util to generate large csv files for testing purposes
 
-##Future tweaks
+## Future tweaks
 - Using hashcodes to improve the performance and possibly get rid of the need of a database
 - Same solution supporting tables of different sizes and keys
 - Better exception management and fault tolerance
