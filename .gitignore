@@ -26,4 +26,5 @@ hs_err_pid*
 target/
 db/
 src/test/resources/huge.csv
+src/test/resources/generated.csv
 *.DS_Store

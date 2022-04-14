@@ -1,21 +1,24 @@
 package com.example.csvparser.handlers;
 
-import org.apache.commons.io.LineIterator;
+import com.example.csvparser.FileWriter;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
-
-import java.io.IOException;
-import java.util.Optional;
 
 @Sql()
 class FileHandlerTest {
 
 
     @Test
-    void testGetFileIterator() throws IOException {
-        Optional<LineIterator> iterator =
-                FileHandler.getFileIterator("./src/test/resources/test.txt");
-        Assertions.assertEquals("Hello World!", iterator.get().nextLine());
+    void testGetFileIterator() {
+        Assertions.assertEquals("Hello World!",
+                                FileHandler.getFileIterator("./src/test/resources/test.txt").get()
+                                           .nextLine());
+    }
+
+    //    @Test
+    void createFile() {
+        FileWriter.writeCsv("./src/test/resources/generated.csv");
     }
 }

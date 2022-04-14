@@ -162,19 +162,19 @@ class DbHandlerTest {
     //endregion - empty check
 
     @Test
-    void testGetCount() throws SQLException {
+    void testGetCount() {
         // given
         subject.init();
         subject.insert(new PageVisitModel("email1", "phone", "source"));
         subject.insert(new PageVisitModel("email2", "phone", "source"));
 
         // then
-        Assertions.assertEquals(2, subject.getCount().get());
+        Assertions.assertEquals(2, subject.getCount());
 
     }
 
     @Test
-    void testGetCountWithDuplicates() throws SQLException {
+    void testGetCountWithDuplicates() {
         // given
         subject.init();
         subject.insert(new PageVisitModel("email1", "phone", "source"));
@@ -183,8 +183,7 @@ class DbHandlerTest {
         subject.insert(new PageVisitModel("email3", "phone", "source"));
 
         // then
-        Assertions.assertEquals(3, subject.getCount().get());
-
+        Assertions.assertEquals(3, subject.getCount());
     }
 
 

@@ -14,6 +14,12 @@ public class PageVisitModel {
         this.source = source;
     }
 
+    public boolean isPoison() {
+        return this.source == null &&
+                this.phone == null &&
+                this.email == null;
+    }
+    
     public boolean isValid() {
         return this.source != null &&
                 !this.source.isEmpty() &&
@@ -21,5 +27,9 @@ public class PageVisitModel {
                 !this.phone.isEmpty() &&
                 this.email != null &&
                 !this.email.isEmpty();
+    }
+
+    public static PageVisitModel getPoison() {
+        return new PageVisitModel(null, null, null);
     }
 }

@@ -9,13 +9,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Optional;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import lombok.SneakyThrows;
 
+import static com.example.csvparser.constants.QueryConstants.CREATE_TABLE;
+import static com.example.csvparser.constants.QueryConstants.DELETE_ALL;
+import static com.example.csvparser.constants.QueryConstants.DROP_TABLE;
+import static com.example.csvparser.constants.QueryConstants.SELECT_COUNT;
+
 public class DbHandler implements AutoCloseable {
+    private static final Logger logger = Logger.getLogger(DbHandler.class.getName());
     static Semaphore semaphore = new Semaphore(1);
     String url;
     Connection conn;
@@ -27,11 +34,9 @@ public class DbHandler implements AutoCloseable {
         this.init();
     }
 
-    private DbHandler() {
-    }
-
     @SneakyThrows
     public void init() {
+        logger.info("Initialising database");
         conn = DriverManager.getConnection(url);
         statement = conn.createStatement();
         createFreshTable(statement);
@@ -39,50 +44,48 @@ public class DbHandler implements AutoCloseable {
     }
 
     private void createFreshTable(Statement statement) throws SQLException {
-        statement.execute(QueryConstants.DROP_TABLE);
-        statement.execute(QueryConstants.CREATE_TABLE);
-    }
-
-    public int deleteAll() {
-        try {
-            return statement.executeUpdate(QueryConstants.DELETE_ALL);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return -1;
+        logger.info("Creating table");
+        statement.execute(DROP_TABLE);
+        statement.execute(CREATE_TABLE);
     }
 
     @SneakyThrows
+    public int deleteAll() {
+        return statement.executeUpdate(DELETE_ALL);
+    }
+
     public int insert(PageVisitModel model) {
-        if (model.isValid() &&
-                semaphore.tryAcquire(60, TimeUnit.SECONDS)) {
-            try {
-                setModelToPreparedStatement(model);
-                return preparedStatement.executeUpdate();
-            } catch (SQLException ignored) {
-            } finally {
-                semaphore.release();
-            }
+        int rowsInserted = -1;
+        if (!model.isValid()) {
+            return rowsInserted;
         }
-        return -1;
+        try {
+            if (semaphore.tryAcquire(60, TimeUnit.SECONDS)) {
+                try {
+                    setModelToPreparedStatement(model);
+                    rowsInserted = preparedStatement.executeUpdate();
+                } finally {
+                    semaphore.release();
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.log(Level.SEVERE, "Error inserting model - " + model.toString(), e);
+        } catch (SQLException ignore) {
+        }
+        return rowsInserted;
     }
 
     private void setModelToPreparedStatement(PageVisitModel model) throws SQLException {
         preparedStatement.setString(1, model.getEmail());
         preparedStatement.setString(2, model.getPhone());
         preparedStatement.setString(3, model.getSource());
-
     }
 
-    public Optional<Long> getCount() {
-        try {
-            ResultSet rs = statement.executeQuery("SELECT COUNT (*) from pagevisits;");
-            rs.next();
-            return Optional.of(rs.getLong(1));
-        } catch (SQLException e) {
-//            e.printStackTrace();
-        }
-        return Optional.empty();
+    @SneakyThrows
+    public Long getCount() {
+        ResultSet rs = statement.executeQuery(SELECT_COUNT);
+        rs.next();
+        return rs.getLong(1);
     }
 
     @Override
