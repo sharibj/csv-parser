@@ -1,15 +1,12 @@
 package com.example.csvparser.handlers;
 
-import com.example.csvparser.constants.QueryConstants;
-import com.example.csvparser.model.PageVisitModel;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.Semaphore;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import lombok.SneakyThrows;
@@ -17,11 +14,11 @@ import lombok.SneakyThrows;
 import static com.example.csvparser.constants.QueryConstants.CREATE_TABLE;
 import static com.example.csvparser.constants.QueryConstants.DELETE_ALL;
 import static com.example.csvparser.constants.QueryConstants.DROP_TABLE;
+import static com.example.csvparser.constants.QueryConstants.INSERT_ROW;
 import static com.example.csvparser.constants.QueryConstants.SELECT_COUNT;
 
 public class DbHandler implements AutoCloseable {
     private static final Logger logger = Logger.getLogger(DbHandler.class.getName());
-    static final Semaphore semaphore = new Semaphore(1);
     String url;
     Connection conn;
     Statement statement;
@@ -38,7 +35,7 @@ public class DbHandler implements AutoCloseable {
         conn = DriverManager.getConnection(url);
         statement = conn.createStatement();
         createFreshTable(statement);
-        preparedStatement = conn.prepareStatement(QueryConstants.INSERT_ROW);
+        preparedStatement = conn.prepareStatement(INSERT_ROW);
     }
 
     private void createFreshTable(Statement statement) throws SQLException {
@@ -48,30 +45,19 @@ public class DbHandler implements AutoCloseable {
     }
 
     @SneakyThrows
-    public int deleteAll() {
-        return statement.executeUpdate(DELETE_ALL);
+    public void deleteAll() {
+        statement.executeUpdate(DELETE_ALL);
     }
 
-    public int insert(PageVisitModel model) {
-        int rowsInserted = -1;
-        if (!model.isValid()) {
-            return rowsInserted;
-        }
-        try {
-            synchronized (semaphore) {
-                setModelToPreparedStatement(model);
-                rowsInserted = preparedStatement.executeUpdate();
-
+    public synchronized void insert(Set<String> messages) {
+        messages.forEach(msg -> {
+            try {
+                preparedStatement.setString(1, msg);
+                preparedStatement.executeUpdate();
+            } catch (SQLException ignore) {
+                //ignore
             }
-        } catch (SQLException ignore) {
-        }
-        return rowsInserted;
-    }
-
-    private void setModelToPreparedStatement(PageVisitModel model) throws SQLException {
-        preparedStatement.setString(1, model.getEmail());
-        preparedStatement.setString(2, model.getPhone());
-        preparedStatement.setString(3, model.getSource());
+        });
     }
 
     @SneakyThrows

@@ -3,7 +3,8 @@ A small project to parse large csv files and get unique count
 
 The entire file never gets loaded in the memory at once.
 1 producer reads the file line by line, generates a message and adds it to a blocking queue.
-At the same time, N (configurable) consumers read from the queue, validate the message, and then try to insert a valid message into the database. 
+At the same time, N (configurable) consumers read from the queue, validate the message, and add it to a local hash set. 
+Once the set reaches a certain size, it's inserted in the database.
 The database has some constraints in place to reject duplicate entries. 
 It's an in-memory database that stores the record on the disk.
 Once the producer finishes, all the consumers get poisoned.
@@ -15,9 +16,7 @@ The database gets purged on every run, so the count always represents the count 
 ## Test result
 - File size = 1.3GB
 - Total rows = 29 Million rows
-- Time taken to compute = 55min
-
-**Note:** Can be made faster using hashcodes. For now, this is listed in the "Future tweaks".
+- Time taken to compute = <4 mins (Earlier it was 55 mins, before using hash sets)
 
 ## Steps to execute
 Go to the project directory and run the blow command
@@ -57,7 +56,6 @@ The output gets simply printed in the console at the end of each parsing cycle.
 - Includes a small util to generate large csv files for testing purposes
 
 ## Future tweaks
-- Using hashcodes to improve the performance and possibly get rid of the need of a database
 - Same solution supporting tables of different sizes and keys
 - Better exception management and fault tolerance
 - Much more test coverage
