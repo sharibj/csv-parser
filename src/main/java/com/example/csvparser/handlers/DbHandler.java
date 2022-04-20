@@ -10,8 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import lombok.SneakyThrows;
@@ -23,7 +21,7 @@ import static com.example.csvparser.constants.QueryConstants.SELECT_COUNT;
 
 public class DbHandler implements AutoCloseable {
     private static final Logger logger = Logger.getLogger(DbHandler.class.getName());
-    static Semaphore semaphore = new Semaphore(1);
+    static final Semaphore semaphore = new Semaphore(1);
     String url;
     Connection conn;
     Statement statement;
@@ -60,16 +58,11 @@ public class DbHandler implements AutoCloseable {
             return rowsInserted;
         }
         try {
-            if (semaphore.tryAcquire(60, TimeUnit.SECONDS)) {
-                try {
-                    setModelToPreparedStatement(model);
-                    rowsInserted = preparedStatement.executeUpdate();
-                } finally {
-                    semaphore.release();
-                }
+            synchronized (semaphore) {
+                setModelToPreparedStatement(model);
+                rowsInserted = preparedStatement.executeUpdate();
+
             }
-        } catch (InterruptedException e) {
-            logger.log(Level.SEVERE, "Error inserting model - " + model.toString(), e);
         } catch (SQLException ignore) {
         }
         return rowsInserted;

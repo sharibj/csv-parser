@@ -14,6 +14,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import lombok.SneakyThrows;
@@ -91,9 +92,7 @@ public class ParseCsv {
         logger.info("shutting down consumers");
         poisonConsumers();
         executor.shutdown();
-        while (!executor.isTerminated()) {
-            Thread.sleep(10);
-        }
+        executor.awaitTermination(NUM_CONSUMERS, TimeUnit.SECONDS);
     }
 
     private long getCount() {
