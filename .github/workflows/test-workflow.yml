@@ -6,8 +6,8 @@ name: Test Workflow
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'src/**'
+#    paths:
+#     - 'src/**'
   workflow_call:
     inputs:
       username:
@@ -23,7 +23,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK 11
+    - name: Set up JDK 11 ${{ secrets.myname }}
       uses: actions/setup-java@v3
       with:
         java-version: '11'
