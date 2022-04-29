@@ -30,4 +30,6 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: ./mvnw clean install && echo ${{ secrets.myname }}
+      run: ./mvnw clean install
+    - name: Print name from secrets
+      run: echo My name is ${{ secrets.myname }}
