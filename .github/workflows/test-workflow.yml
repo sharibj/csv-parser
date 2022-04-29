@@ -26,13 +26,13 @@ jobs:
     - shell: bash
       name: Try 2
       env:
-        SUPER_SECRET: ${{ secrets.myname }}
+        SUPER_SECRET: ${{ secrets.MYNAME }}
       run: |
         echo "$SUPER_SECRET"
     - name: Print name from secrets
       shell: bash
       env:
-        myname: ${{ secrets.myname }}
+        myname: ${{ secrets.MYNAME }}
       if: env.myname == 'Sharib Jafari'
       run:
         echo "My name is Sharib Jafari"
