@@ -16,7 +16,6 @@ public class FileWriter {
 
     @SneakyThrows
     private static void writeData(String data, FileOutputStream fileOutputStream) {
-        //Adding this comment to trigger github workflow
         fileOutputStream.write(data.getBytes(StandardCharsets.UTF_8));
         fileOutputStream.write("\n".getBytes(StandardCharsets.UTF_8));
     }
