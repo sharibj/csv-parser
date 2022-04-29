@@ -35,4 +35,4 @@ jobs:
       shell: bash
       env:
         myname: ${{ secrets.myname }}
-      run: echo "My name is $myname"
+      run: 'echo "$myname"'
