@@ -53,7 +53,6 @@ public class FileWriter {
         System.out.println("Time taken to generate file in sec = " + duration);
         System.out.println("\n-------------------------------------------\n");
     }
-
 }
 
 @Getter
