@@ -23,6 +23,13 @@ jobs:
 #         cache: maven
 #     - name: Build with Maven
 #       run: ./mvnw clean install
+    - name: Try 3
+      env:
+        name-env: ${{ secrets.MYNAME }}
+      shell: bash
+      run: |
+        echo "$name-env"
+      
     - shell: bash
       name: Try 2
       env:
