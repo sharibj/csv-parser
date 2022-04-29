@@ -35,5 +35,7 @@ jobs:
       shell: bash
       env:
         myname: ${{ secrets.myname }}
-      if: ${{ secrets.myname }} == 'Sharib Jafari'
-      run: echo 'Sharib Jafari'
+      run:
+        if echo "$myname" | grep 'Sharib Jafari'; then
+          echo "My name is Sharib Jafari"
+        fi
