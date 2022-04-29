@@ -28,7 +28,7 @@ jobs:
       env:
         SUPER_SECRET: ${{ secrets.MYNAME }}
       run: |
-        echo "$SUPER_SECRET"
+        [[ $SUPER_SECRET == *"Sharib"* ]] && echo "My name is Sharib"
     - name: Print name from secrets
       shell: bash
       env:
