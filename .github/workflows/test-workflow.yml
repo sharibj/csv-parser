@@ -35,4 +35,5 @@ jobs:
       shell: bash
       env:
         myname: ${{ secrets.myname }}
-      run: 'echo "$myname"'
+      if: myname == 'Sharib Jafari'
+      run: echo 'Sharib Jafari'
