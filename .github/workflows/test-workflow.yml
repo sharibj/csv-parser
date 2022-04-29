@@ -36,6 +36,8 @@ jobs:
       env:
         myname: ${{ secrets.myname }}
       run:
-        if echo "$myname" | grep 'Sharib Jafari'; then
-          echo "My name is Sharib Jafari"
+        if [ "$myname" = "Sharib Jafari" ]; then
+          echo "Strings are equal."
+        else
+          echo "Strings are not equal."
         fi
